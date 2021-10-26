@@ -165,6 +165,10 @@ func (m *MockOIDC) QueueUser(user User) {
 	m.UserQueue.Push(user)
 }
 
+func (m *MockOIDC) QueueUserWithIdp(idp string, user User) {
+	m.SpecialUserQueue.Push(idp, user)
+}
+
 // QueueCode allows adding mock code strings to the authentication queue.
 // Calls to the `authorization_endpoint` will pop these code strings
 // off the queue and create a session with them and return them as the
