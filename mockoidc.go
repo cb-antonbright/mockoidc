@@ -69,15 +69,17 @@ func NewServer(key *rsa.PrivateKey) (*MockOIDC, error) {
 	}
 
 	return &MockOIDC{
-		ClientID:         clientID,
-		ClientSecret:     clientSecret,
-		AccessTTL:        time.Duration(10) * time.Minute,
-		RefreshTTL:       time.Duration(60) * time.Minute,
-		Keypair:          keypair,
-		SessionStore:     NewSessionStore(),
-		UserQueue:        &UserQueue{},
-		SpecialUserQueue: &SpecialUserQueue{},
-		ErrorQueue:       &ErrorQueue{},
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		AccessTTL:    time.Duration(10) * time.Minute,
+		RefreshTTL:   time.Duration(60) * time.Minute,
+		Keypair:      keypair,
+		SessionStore: NewSessionStore(),
+		UserQueue:    &UserQueue{},
+		SpecialUserQueue: &SpecialUserQueue{
+			Queue: make(map[string][]User),
+		},
+		ErrorQueue: &ErrorQueue{},
 	}, nil
 }
 
