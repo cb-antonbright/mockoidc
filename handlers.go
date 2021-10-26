@@ -99,14 +99,33 @@ func (m *MockOIDC) Authorize(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	session, err := m.SessionStore.NewSession(
-		req.Form.Get("scope"),
-		req.Form.Get("nonce"),
-		m.UserQueue.Pop(),
-	)
-	if err != nil {
-		internalServerError(rw, err.Error())
-		return
+	idp := req.Form.Get("idp")
+
+	fmt.Println(idp)
+
+	var session *Session
+	if idp == "" {
+		session, err = m.SessionStore.NewSession(
+			req.Form.Get("scope"),
+			req.Form.Get("nonce"),
+			m.UserQueue.Pop(),
+		)
+		if err != nil {
+			internalServerError(rw, err.Error())
+			return
+		}
+	} else {
+		idp := req.Form.Get("idp")
+		fmt.Println(idp)
+		session, err = m.SessionStore.NewSession(
+			req.Form.Get("scope"),
+			req.Form.Get("nonce"),
+			m.SpecialUserQueue.Pop(idp),
+		)
+		if err != nil {
+			internalServerError(rw, err.Error())
+			return
+		}
 	}
 
 	redirectURI, err := url.Parse(req.Form.Get("redirect_uri"))

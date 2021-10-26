@@ -28,11 +28,12 @@ type MockOIDC struct {
 
 	// Normally, these would be private. Expose them publicly for
 	// power users.
-	Server       *http.Server
-	Keypair      *Keypair
-	SessionStore *SessionStore
-	UserQueue    *UserQueue
-	ErrorQueue   *ErrorQueue
+	Server           *http.Server
+	Keypair          *Keypair
+	SessionStore     *SessionStore
+	SpecialUserQueue *SpecialUserQueue
+	UserQueue        *UserQueue
+	ErrorQueue       *ErrorQueue
 
 	tlsConfig   *tls.Config
 	middleware  []func(http.Handler) http.Handler
@@ -68,14 +69,15 @@ func NewServer(key *rsa.PrivateKey) (*MockOIDC, error) {
 	}
 
 	return &MockOIDC{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		AccessTTL:    time.Duration(10) * time.Minute,
-		RefreshTTL:   time.Duration(60) * time.Minute,
-		Keypair:      keypair,
-		SessionStore: NewSessionStore(),
-		UserQueue:    &UserQueue{},
-		ErrorQueue:   &ErrorQueue{},
+		ClientID:         clientID,
+		ClientSecret:     clientSecret,
+		AccessTTL:        time.Duration(10) * time.Minute,
+		RefreshTTL:       time.Duration(60) * time.Minute,
+		Keypair:          keypair,
+		SessionStore:     NewSessionStore(),
+		UserQueue:        &UserQueue{},
+		SpecialUserQueue: &SpecialUserQueue{},
+		ErrorQueue:       &ErrorQueue{},
 	}, nil
 }
 

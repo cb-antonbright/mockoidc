@@ -2,6 +2,11 @@ package mockoidc
 
 import "sync"
 
+type SpecialUserQueue struct {
+	sync.Mutex
+	Queue map[string][]User
+}
+
 // UserQueue manages the queue of Users returned for each
 // call to the authorize endpoint
 type UserQueue struct {
@@ -27,6 +32,28 @@ type ServerError struct {
 	Code        int
 	Error       string
 	Description string
+}
+
+func (q *SpecialUserQueue) Push(idp string, user User) {
+	q.Lock()
+	defer q.Unlock()
+	q.Queue[idp] = append(q.Queue[idp], user)
+}
+
+func (q *SpecialUserQueue) Pop(idp string) User {
+	q.Lock()
+	defer q.Unlock()
+	if _, ok := q.Queue[idp]; ok {
+		if len(q.Queue[idp]) == 0 {
+			return DefaultUser()
+		}
+
+		var user User
+		user, q.Queue[idp] = q.Queue[idp][0], q.Queue[idp][1:]
+		return user
+	} else {
+		return DefaultUser()
+	}
 }
 
 // Push adds a User to the Queue to be set in subsequent calls to the
