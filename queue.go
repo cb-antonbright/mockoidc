@@ -58,6 +58,8 @@ func (q *SpecialUserQueue) Pop(idp string) User {
 
 func (q *SpecialUserQueue) GetIdpsExhaustedWithUsers() []string {
 	returnString := []string{}
+	q.Lock()
+	defer q.Unlock()
 	for idp := range q.Queue {
 		if len(q.Queue[idp]) == 0 {
 			returnString = append(returnString, idp)
