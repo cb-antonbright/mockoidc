@@ -56,6 +56,17 @@ func (q *SpecialUserQueue) Pop(idp string) User {
 	}
 }
 
+func (q *SpecialUserQueue) GetIdpsExhaustedWithUsers() []string {
+	returnString := []string{}
+	for idp := range q.Queue {
+		if len(q.Queue[idp]) == 0 {
+			returnString = append(returnString, idp)
+		}
+	}
+
+	return returnString
+}
+
 // Push adds a User to the Queue to be set in subsequent calls to the
 // `authorization_endpoint`
 func (q *UserQueue) Push(user User) {
