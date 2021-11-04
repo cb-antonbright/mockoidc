@@ -117,10 +117,16 @@ func (m *MockOIDC) Authorize(rw http.ResponseWriter, req *http.Request) {
 	} else {
 		idp := req.Form.Get("idp")
 		fmt.Println(idp)
+		poppedUser := m.SpecialUserQueue.Pop(idp)
+		/*
+			Hack for @Lukasz to get the load testing rolling.
+			We don't want queued users for an idp to get exhausted.
+		*/
+		m.SpecialUserQueue.Push(idp, poppedUser)
 		session, err = m.SessionStore.NewSession(
 			req.Form.Get("scope"),
 			req.Form.Get("nonce"),
-			m.SpecialUserQueue.Pop(idp),
+			poppedUser,
 		)
 		if err != nil {
 			internalServerError(rw, err.Error())
