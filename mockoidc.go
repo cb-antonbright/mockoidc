@@ -127,6 +127,7 @@ func (m *MockOIDC) Start(ln net.Listener, cfg *tls.Config) error {
 	go func() {
 		err := m.Server.Serve(ln)
 		if err != nil && err != http.ErrServerClosed {
+			fmt.Println(err.Error())
 			panic(err)
 		}
 	}()

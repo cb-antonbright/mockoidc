@@ -75,6 +75,8 @@ var (
 func (m *MockOIDC) Authorize(rw http.ResponseWriter, req *http.Request) {
 	err := req.ParseForm()
 	if err != nil {
+		fmt.Println("Authorize ")
+		fmt.Println(err.Error())
 		internalServerError(rw, err.Error())
 		return
 	}
@@ -111,6 +113,7 @@ func (m *MockOIDC) Authorize(rw http.ResponseWriter, req *http.Request) {
 			m.UserQueue.Pop(),
 		)
 		if err != nil {
+			fmt.Println(err.Error())
 			internalServerError(rw, err.Error())
 			return
 		}
@@ -129,6 +132,7 @@ func (m *MockOIDC) Authorize(rw http.ResponseWriter, req *http.Request) {
 			poppedUser,
 		)
 		if err != nil {
+			fmt.Println(err)
 			internalServerError(rw, err.Error())
 			return
 		}
@@ -284,11 +288,13 @@ func (m *MockOIDC) setTokens(tr *tokenResponse, s *Session, grantType string) er
 	var err error
 	tr.AccessToken, err = s.AccessToken(m.Config(), m.Keypair, m.Now())
 	if err != nil {
+		fmt.Printf("setTokens - %s", err.Error())
 		return err
 	}
 	if len(s.Scopes) > 0 && s.Scopes[0] == openidScope {
 		tr.IDToken, err = s.IDToken(m.Config(), m.Keypair, m.Now())
 		if err != nil {
+			fmt.Printf("setTokens - %s", err.Error())
 			return err
 		}
 	}
@@ -474,6 +480,7 @@ func errorResponse(rw http.ResponseWriter, error, description string, statusCode
 
 	_, err = rw.Write(resp)
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
 }
@@ -489,6 +496,7 @@ func jsonResponse(rw http.ResponseWriter, data []byte) {
 
 	_, err := rw.Write(data)
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
 }

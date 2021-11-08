@@ -2,6 +2,7 @@ package mockoidc
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -42,6 +43,7 @@ func NewSessionStore() *SessionStore {
 func (ss *SessionStore) NewSession(scope string, nonce string, user User) (*Session, error) {
 	sessionID, err := ss.CodeQueue.Pop()
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil, err
 	}
 
@@ -60,6 +62,7 @@ func (ss *SessionStore) NewSession(scope string, nonce string, user User) (*Sess
 func (ss *SessionStore) GetSessionByID(id string) (*Session, error) {
 	session, ok := ss.Store[id]
 	if !ok {
+		fmt.Println("GetSessionByID - Session Not Found")
 		return nil, errors.New("session not found")
 	}
 	return session, nil
@@ -70,6 +73,7 @@ func (ss *SessionStore) GetSessionByID(id string) (*Session, error) {
 func (ss *SessionStore) GetSessionByToken(token *jwt.Token) (*Session, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
+		fmt.Println("GetSessionByToken - invalid token")
 		return nil, errors.New("invalid token")
 	}
 
@@ -100,6 +104,8 @@ func (s *Session) IDToken(config *Config, kp *Keypair, now time.Time) (string, e
 	}
 	claims, err := s.User.Claims(s.Scopes, base)
 	if err != nil {
+		fmt.Printf("IDToken - %s", err.Error())
+
 		return "", err
 	}
 
